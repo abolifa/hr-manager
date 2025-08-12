@@ -104,40 +104,35 @@ class OutgoingResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('company.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('recipient.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('issue_number')
+                    ->label('إشاري')
+                    ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('company.name')
+                    ->label('الشركة')
+                    ->searchable()
+                    ->alignCenter()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('issue_date')
-                    ->date()
+                    ->label('تاريخ')
+                    ->date('d/m/Y')
+                    ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('to')
+                    ->label('إلى')
+                    ->alignCenter()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->label('العنوان')
+                    ->alignCenter()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteAction::make(),
             ]);
     }
 

@@ -1,5 +1,3 @@
-@php use Carbon\Carbon; @endphp
-
 <style>
     :root {
         --page-w: 210mm;
@@ -181,7 +179,7 @@
                 <div class="signature">
                     <div class="names">
                         <h3>مفوض الشركة</h3>
-                        <p>{{ $ceo_name ?? '__________________' }}</p>
+                        <p>{{ $ceo_name ?? '' }}</p>
                     </div>
                 </div>
             </div>

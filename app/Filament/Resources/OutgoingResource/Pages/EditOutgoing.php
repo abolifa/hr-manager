@@ -13,6 +13,11 @@ class EditOutgoing extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('print')
+                ->label('طباعة')
+                ->icon('heroicon-o-printer')
+                ->url(fn($record) => route('outgoings.print', $record))
+                ->openUrlInNewTab(),
             Actions\DeleteAction::make(),
         ];
     }
