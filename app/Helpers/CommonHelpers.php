@@ -2,8 +2,10 @@
 
 namespace App\Helpers;
 
+use App\Models\Incoming;
 use App\Models\Outgoing;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use niklasravnsborg\LaravelPdf\Facades\Pdf;
 use setasign\Fpdi\Fpdi;
@@ -43,6 +45,7 @@ class CommonHelpers
      * @throws PdfTypeException
      * @throws FilterException
      */
+
     public static function mergePdfsInMemory(array $paths): string
     {
         $pdf = new Fpdi();
@@ -80,6 +83,22 @@ class CommonHelpers
         return "$next-$year";
     }
 
+    public static function nextIncomingNumber(): string
+    {
+        $year = now()->year;
+        $last = Incoming::query()
+            ->where('internal_number', 'like', '%-' . $year)
+            ->latest('id')
+            ->value('internal_number');
+
+        if ($last && preg_match('/^(\d+)-' . $year . '$/', $last, $m)) {
+            $next = (int)$m[1] + 1;
+        } else {
+            $next = 1;
+        }
+        return "$next-$year";
+    }
+
 
     public static function downloadOutgoing($id): Response
     {
@@ -98,12 +117,12 @@ class CommonHelpers
                     $letterheadForMpdf = $tmp;
                 } catch (Throwable $e) {
                     $letterheadForMpdf = null;
+                    Log::error('Error processing letterhead image: ' . $e->getMessage());
                 }
             } else {
                 $letterheadForMpdf = $letterheadPath;
             }
         }
-
         $data = [
             'issue_number' => $outgoing->issue_number,
             'issue_date' => $outgoing->issue_date,
@@ -113,6 +132,7 @@ class CommonHelpers
             'ceo_name' => optional($outgoing->company)->ceo,
             'letterhead_data_url' => null,
         ];
+
         $config = [
             'format' => 'A4',
             'orientation' => 'P',
@@ -123,7 +143,7 @@ class CommonHelpers
             'mode' => 'utf-8',
             'autoScriptToLang' => true,
             'autoLangToFont' => true,
-
+            'dpi' => 100,
             'instanceConfigurator' => function ($mpdf) use ($letterheadForMpdf) {
                 if ($letterheadForMpdf && file_exists($letterheadForMpdf)) {
                     $mpdf->SetWatermarkImage($letterheadForMpdf, 1.0, [210, 297], 0, 0);
@@ -134,8 +154,13 @@ class CommonHelpers
         ];
 
         $pdf = Pdf::loadView('outgoing.print', $data, [], $config);
-        return $pdf->stream("outgoing-{$outgoing->issue_number}.pdf");
+        $content = $pdf->output();
+        $path = "outgoings/outgoing-$outgoing->issue_number.pdf";
+        Storage::disk('public')->put($path, $content);
+        return response($content, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "inline; filename=\"outgoing-$outgoing->issue_number.pdf\"",
+        ]);
     }
-
 
 }

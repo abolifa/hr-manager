@@ -26,9 +26,6 @@ class BankAccountResource extends Resource
     protected static ?string $label = 'حساب';
     protected static ?string $pluralLabel = 'الحسابات المصرفية';
 
-    protected static ?string $navigationGroup = 'إدارة الشركات';
-
-    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

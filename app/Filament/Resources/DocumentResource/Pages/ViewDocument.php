@@ -21,12 +21,12 @@ class ViewDocument extends ViewRecord
             ->schema([
                 Section::make([
                     TextEntry::make('company.name')
-                        ->size(TextEntry\TextEntrySize::Large)
+                        ->size(TextEntry\TextEntrySize::Medium)
                         ->weight(FontWeight::SemiBold)
                         ->label('الشركة'),
                     TextEntry::make('type')
                         ->label('نوع المستند')
-                        ->size(TextEntry\TextEntrySize::Large)
+                        ->size(TextEntry\TextEntrySize::Medium)
                         ->weight(FontWeight::SemiBold)
                         ->formatStateUsing(fn($state) => match ($state) {
                             'commercial_registration' => 'سجل تجاري',
@@ -46,16 +46,16 @@ class ViewDocument extends ViewRecord
                         }),
                     TextEntry::make('document_number')
                         ->label('رقم المستند')
-                        ->size(TextEntry\TextEntrySize::Large)
+                        ->size(TextEntry\TextEntrySize::Medium)
                         ->weight(FontWeight::SemiBold)
                         ->placeholder('-'),
                     TextEntry::make('issue_date')
                         ->label('تاريخ الإصدار')
-                        ->size(TextEntry\TextEntrySize::Large)
+                        ->size(TextEntry\TextEntrySize::Medium)
                         ->weight(FontWeight::SemiBold)
                         ->date('d/m/Y'),
                     TextEntry::make('expiry_date')
-                        ->size(TextEntry\TextEntrySize::Large)
+                        ->size(TextEntry\TextEntrySize::Medium)
                         ->weight(FontWeight::SemiBold)
                         ->label('تاريخ الانتهاء')
                         ->date('d/m/Y'),

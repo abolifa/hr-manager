@@ -17,11 +17,9 @@ class RecipientResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-users-rectangle';
 
-    protected static ?int $navigationSort = 4;
     protected static ?string $label = 'جهة';
     protected static ?string $pluralLabel = 'جهات الإتصال';
 
-    protected static ?string $navigationGroup = 'إدارة الشركات';
 
     public static function form(Form $form): Form
     {

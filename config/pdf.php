@@ -15,12 +15,12 @@ return [
     'icc_profile_path' => '',
     'font_path' => public_path('fonts/'),
     'font_data' => [
-        'cairo' => [
-            'R' => 'Cairo-Regular.ttf',
-            'B' => 'Cairo-Bold.ttf',
-            'useOTL' => 0xFF,
-            'useKashida' => 75,
+        'tajawal' => [
+            'R' => 'Tajawal-Regular.ttf',
+            'B' => 'Tajawal-Bold.ttf',
+            'useOTL' => 0xFF,   // for Arabic shaping
+            'useKashida' => 75, // optional
         ],
     ],
-    'default_font' => 'arial',
+    'default_font' => 'tajawal',
 ];

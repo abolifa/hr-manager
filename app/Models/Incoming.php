@@ -16,6 +16,7 @@ class Incoming extends Model
         'company_id',
         'internal_number',
         'from_recipient_id',
+        'from_name',
         'received_date',
         'notes',
         'attachments',

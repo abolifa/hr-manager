@@ -18,11 +18,9 @@ class DocumentResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-file-contract';
 
-    protected static ?int $navigationSort = 2;
     protected static ?string $label = 'مستند';
     protected static ?string $pluralLabel = 'المستندات';
 
-    protected static ?string $navigationGroup = 'إدارة الشركات';
 
     public static function form(Form $form): Form
     {

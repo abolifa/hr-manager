@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('internal_number')->unique();
             $table->foreignId('from_recipient_id')->nullable()->constrained('recipients')->nullOnDelete();
+            $table->string('from_name')->nullable();
             $table->date('received_date')->nullable();
             $table->string('notes')->nullable();
             $table->json('attachments');

@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->profile()
-            ->font('Cairo')
+            ->font('Tajawal')
             ->sidebarWidth('280px')
             ->login()
             ->maxContentWidth('full')

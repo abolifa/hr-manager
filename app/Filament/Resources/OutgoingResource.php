@@ -20,8 +20,6 @@ class OutgoingResource extends Resource
 
     protected static ?string $navigationIcon = 'fas-file-arrow-up';
 
-    protected static ?string $navigationGroup = 'المراسلات';
-
 
     protected static ?string $label = 'صادر';
     protected static ?string $pluralLabel = 'البريد الصادر';
@@ -68,7 +66,7 @@ class OutgoingResource extends Resource
                             ->reactive()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('title')
-                            ->label('العنوان')
+                            ->label('الموضوع')
                             ->columnSpanFull()
                             ->reactive()
                             ->required()
@@ -127,10 +125,13 @@ class OutgoingResource extends Resource
                     ->alignCenter()
                     ->searchable(),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
+                Tables\Actions\Action::make('print')
+                    ->label('طباعة')
+                    ->icon('heroicon-o-printer')
+                    ->url(fn($record) => route('outgoings.print', $record))
+                    ->color('success')
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ]);

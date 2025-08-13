@@ -18,10 +18,8 @@ class CompanyResource extends Resource
 
 
     protected static ?string $label = 'شركة';
-    protected static ?int $navigationSort = 1;
     protected static ?string $pluralLabel = 'الشركات';
 
-    protected static ?string $navigationGroup = 'إدارة الشركات';
 
     public static function form(Form $form): Form
     {
