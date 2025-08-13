@@ -99,30 +99,32 @@ class CommonHelpers
         return "$next-$year";
     }
 
-
-    public static function downloadOutgoing($id): Response
+    public static function buildOutgoingPdf(Outgoing $outgoing): array
     {
-        $outgoing = Outgoing::with(['company', 'recipient'])->findOrFail($id);
+        $letterheadForMpdf = null;
         $letterheadPath = optional($outgoing->company)->letterhead
             ? public_path('storage/' . ltrim($outgoing->company->letterhead, '/'))
             : null;
-        if ($letterheadPath && file_exists($letterheadPath)) {
-            $mime = mime_content_type($letterheadPath);
-            if ($mime === 'image/webp') {
-                try {
+
+        if ($letterheadPath && is_file($letterheadPath)) {
+            try {
+                $mime = mime_content_type($letterheadPath) ?: '';
+                if ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) {
                     $img = imagecreatefromwebp($letterheadPath);
                     $tmp = storage_path('app/letterhead_for_mpdf.png');
                     imagepng($img, $tmp);
                     imagedestroy($img);
                     $letterheadForMpdf = $tmp;
-                } catch (Throwable $e) {
-                    $letterheadForMpdf = null;
-                    Log::error('Error processing letterhead image: ' . $e->getMessage());
+                } else {
+                    $letterheadForMpdf = $letterheadPath;
                 }
-            } else {
-                $letterheadForMpdf = $letterheadPath;
+            } catch (Throwable $e) {
+                Log::error('Error processing letterhead image: ' . $e->getMessage());
+                $letterheadForMpdf = null;
             }
         }
+
+        // --- view data
         $data = [
             'issue_number' => $outgoing->issue_number,
             'issue_date' => $outgoing->issue_date,
@@ -145,7 +147,72 @@ class CommonHelpers
             'autoLangToFont' => true,
             'dpi' => 100,
             'instanceConfigurator' => function ($mpdf) use ($letterheadForMpdf) {
-                if ($letterheadForMpdf && file_exists($letterheadForMpdf)) {
+                if ($letterheadForMpdf && is_file($letterheadForMpdf)) {
+                    $mpdf->SetWatermarkImage($letterheadForMpdf, 1.0, [210, 297], 0, 0);
+                    $mpdf->showWatermarkImage = true;
+                    $mpdf->watermarkImgBehind = true;
+                }
+            },
+        ];
+        $pdf = Pdf::loadView('outgoing.print', $data, [], $config);
+        $content = $pdf->output();
+        $filename = "outgoing-{$outgoing->issue_number}.pdf";
+        $path = "outgoings/{$filename}";
+        return compact('content', 'filename', 'path');
+    }
+
+
+    public static function downloadOutgoing($id): Response
+    {
+        $outgoing = Outgoing::with(['company', 'recipient'])->findOrFail($id);
+
+        $letterheadForMpdf = null;
+
+        $letterheadPath = optional($outgoing->company)->letterhead
+            ? public_path('storage/' . ltrim($outgoing->company->letterhead, '/'))
+            : null;
+
+        if ($letterheadPath && is_file($letterheadPath)) {
+            try {
+                $mime = mime_content_type($letterheadPath) ?: '';
+                if ($mime === 'image/webp' && function_exists('imagecreatefromwebp')) {
+                    $img = imagecreatefromwebp($letterheadPath);
+                    $tmp = storage_path('app/letterhead_for_mpdf.png');
+                    imagepng($img, $tmp);
+                    imagedestroy($img);
+                    $letterheadForMpdf = $tmp;
+                } else {
+                    $letterheadForMpdf = $letterheadPath;
+                }
+            } catch (Throwable $e) {
+                Log::error('Error processing letterhead image: ' . $e->getMessage());
+                $letterheadForMpdf = null;
+            }
+        }
+
+        $data = [
+            'issue_number' => $outgoing->issue_number,
+            'issue_date' => $outgoing->issue_date,
+            'receiver' => $outgoing->to,
+            'title' => $outgoing->title,
+            'body' => $outgoing->body,
+            'ceo_name' => optional($outgoing->company)->ceo,
+            'letterhead_data_url' => null,
+        ];
+
+        $config = [
+            'format' => 'A4',
+            'orientation' => 'P',
+            'margin_top' => 55,
+            'margin_right' => 20,
+            'margin_bottom' => 40,
+            'margin_left' => 20,
+            'mode' => 'utf-8',
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'dpi' => 100,
+            'instanceConfigurator' => function ($mpdf) use ($letterheadForMpdf) {
+                if ($letterheadForMpdf && is_file($letterheadForMpdf)) {
                     $mpdf->SetWatermarkImage($letterheadForMpdf, 1.0, [210, 297], 0, 0);
                     $mpdf->showWatermarkImage = true;
                     $mpdf->watermarkImgBehind = true;
@@ -155,11 +222,13 @@ class CommonHelpers
 
         $pdf = Pdf::loadView('outgoing.print', $data, [], $config);
         $content = $pdf->output();
-        $path = "outgoings/outgoing-$outgoing->issue_number.pdf";
+        $filename = "outgoing-{$outgoing->issue_number}.pdf";
+        $path = "outgoings/{$filename}";
         Storage::disk('public')->put($path, $content);
+
         return response($content, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "inline; filename=\"outgoing-$outgoing->issue_number.pdf\"",
+            'Content-Disposition' => "inline; filename=\"{$filename}\"",
         ]);
     }
 

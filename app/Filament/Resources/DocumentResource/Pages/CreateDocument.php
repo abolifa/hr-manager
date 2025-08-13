@@ -25,7 +25,6 @@ class CreateDocument extends CreateRecord
             $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                // Convert image to PDF
                 $file = CommonHelpers::convertImageToPdf($file);
             }
 

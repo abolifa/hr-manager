@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Recipient;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Recipient>
+ * @extends Factory<Recipient>
  */
 class RecipientFactory extends Factory
 {
@@ -16,8 +17,14 @@ class RecipientFactory extends Factory
      */
     public function definition(): array
     {
+        $faker = $this->faker;
         return [
-            //
+            'name' => $faker->name(),
+            'email' => $faker->unique()->safeEmail(),
+            'phone' => $faker->unique()->numerify('091#######'),
+            'address' => $faker->optional()->address(),
+            'is_government' => $faker->boolean(30),
+            'active' => $faker->boolean(90),
         ];
     }
 }

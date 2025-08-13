@@ -55,4 +55,9 @@ class Company extends Model
     {
         return $this->hasMany(Outgoing::class);
     }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
+    }
 }

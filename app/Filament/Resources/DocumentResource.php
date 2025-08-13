@@ -57,19 +57,25 @@ class DocumentResource extends Resource
                         ->required(),
                     Forms\Components\DatePicker::make('issue_date')
                         ->label('تاريخ الإصدار')
+                        ->default(now())
                         ->required(),
                     Forms\Components\DatePicker::make('expiry_date')
                         ->label('تاريخ الانتهاء')
+                        ->default(now()->addYear())
                         ->required(),
                     Forms\Components\FileUpload::make('attachments')
                         ->label('المستند')
                         ->multiple()
                         ->imageEditor()
                         ->columnSpanFull()
+                        ->required()
                         ->directory('documents')
                         ->acceptedFileTypes([
                             'application/pdf',
-                            'image/*',
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                            'image/webp',
                         ]),
                 ])->columns(),
             ]);
